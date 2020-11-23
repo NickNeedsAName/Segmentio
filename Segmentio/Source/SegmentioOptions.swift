@@ -113,21 +113,29 @@ public enum SegmentioIndicatorType {
     
 }
 
+public enum SegmentioIndicatorAlignment {
+    case left
+    case center
+    case right
+}
+
 public struct SegmentioIndicatorOptions {
     
     var type: SegmentioIndicatorType
     var ratio: CGFloat
     var height: CGFloat
     var color: UIColor
+    var alignment: SegmentioIndicatorAlignment
     var roundedCorners: Bool
     
     public init(type: SegmentioIndicatorType = .bottom, ratio: CGFloat = 1, height: CGFloat = 2,
-                color: UIColor = .orange, roundedCorners: Bool = false) {
+                color: UIColor = .orange, roundedCorners: Bool = false, alignment: SegmentioIndicatorAlignment = .center) {
         self.type = type
         self.ratio = ratio
         self.height = height
         self.color = color
         self.roundedCorners = roundedCorners
+        self.alignment = alignment
     }
     
 }

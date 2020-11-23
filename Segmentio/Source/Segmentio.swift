@@ -355,9 +355,12 @@ open class Segmentio: UIView {
         
         let isCommonBehaviour = (isFlipped && isRTL) || (!isFlipped && !isRTL)
         
+        let indicatorAlignment = segmentioOptions.indicatorOptions?.alignment ?? .center
+        
         if let indicatorLayer = indicatorLayer, let options = segmentioOptions.indicatorOptions {
-            let item = itemInSuperview(ratio: options.ratio)
+            let item = itemInSuperview(ratio: options.ratio, alignment: indicatorAlignment)
 
+            
             let points = Points(
                 item: item,
                 atIndex: selectedSegmentioIndex,
@@ -366,7 +369,8 @@ open class Segmentio: UIView {
                 position: segmentioOptions.segmentPosition,
                 style: segmentioStyle,
                 insets: superviewInsets,
-                isCommonBehaviour: isCommonBehaviour
+                isCommonBehaviour: isCommonBehaviour,
+                alignment: indicatorAlignment
             )
             let insetX = ((points.endPoint.x - points.startPoint.x) - (item.endX - item.startX)) / 2
             
@@ -394,7 +398,8 @@ open class Segmentio: UIView {
                 position: segmentioOptions.segmentPosition,
                 style: segmentioStyle,
                 insets: superviewInsets,
-                isCommonBehaviour: isCommonBehaviour
+                isCommonBehaviour: isCommonBehaviour,
+                alignment: indicatorAlignment
             )
 
             moveShapeLayer(
@@ -475,7 +480,7 @@ open class Segmentio: UIView {
     
     // MARK: - Item in superview
     
-    private func itemInSuperview(ratio: CGFloat = 1) -> ItemInSuperview {
+    private func itemInSuperview(ratio: CGFloat = 1, alignment: SegmentioIndicatorAlignment = .center) -> ItemInSuperview {
         var collectionViewWidth: CGFloat = 0
         var cellWidth: CGFloat = 0
         var cellRect = CGRect.zero
@@ -498,12 +503,27 @@ open class Segmentio: UIView {
             
             shapeLayerWidth = floor(cellWidth * ratio)
         }
+        
+        let startX: CGFloat
+        let endX: CGFloat
+        switch alignment {
+        case .center:
+            startX = floor(cellRect.midX - (shapeLayerWidth / 2))
+            endX = floor(cellRect.midX + (shapeLayerWidth / 2))
+        case .left:
+            startX = cellRect.minX
+            endX = cellRect.minX + shapeLayerWidth
+        case .right:
+            startX = cellRect.maxX - shapeLayerWidth
+            endX = cellRect.maxX
+        }
+        
         return ItemInSuperview(
             collectionViewWidth: collectionViewWidth,
             cellFrameInSuperview: cellRect,
             shapeLayerWidth: shapeLayerWidth,
-            startX: floor(cellRect.midX - (shapeLayerWidth / 2)),
-            endX: floor(cellRect.midX + (shapeLayerWidth / 2)),
+            startX: startX,
+            endX: endX,
             isLastItem: selectedSegmentioIndex == segmentioItems.count - 1
         )
     }
@@ -679,7 +699,7 @@ extension Segmentio: UIScrollViewDelegate {
         }
 
         if let options = segmentioOptions.indicatorOptions, let indicatorLayer = indicatorLayer {
-            let item = itemInSuperview(ratio: options.ratio)
+            let item = itemInSuperview(ratio: options.ratio, alignment: options.alignment)
             moveShapeLayer(
                 indicatorLayer,
                 startPoint: CGPoint(x: item.startX, y: indicatorPointY()),
@@ -708,9 +728,11 @@ extension Segmentio: UIScrollViewDelegate {
 
 extension Segmentio.Points {
     
-    init(item: Segmentio.ItemInSuperview, atIndex index: Int, allItemsCellWidth: [CGFloat], pointY: CGFloat, position: SegmentioPosition, style: SegmentioStyle, insets: UIEdgeInsets, isCommonBehaviour: Bool) {
+    init(item: Segmentio.ItemInSuperview, atIndex index: Int, allItemsCellWidth: [CGFloat], pointY: CGFloat, position: SegmentioPosition, style: SegmentioStyle, insets: UIEdgeInsets, isCommonBehaviour: Bool, alignment: SegmentioIndicatorAlignment) {
         let separatorWidth: CGFloat = 1
+        // width of selected cell
         let cellWidth = item.cellFrameInSuperview.width
+        // start and endX represent the start and endX of the indicator??
         var startX = item.startX
         var endX = item.endX
         var spaceBefore: CGFloat = isCommonBehaviour ? insets.left : -insets.right
