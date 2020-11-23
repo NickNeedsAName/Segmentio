@@ -747,20 +747,46 @@ extension Segmentio.Points {
         // Cell will try to position itself in the middle, unless it can't because
         // the collection view has reached the beginning or end
         
-        startX = (item.collectionViewWidth / 2) - (cellWidth / 2)
+        switch  alignment {
+        case .center:
+            startX = (item.collectionViewWidth / 2) - (cellWidth / 2)
+        case .left:
+            startX = (item.collectionViewWidth / 2) - cellWidth
+        case .right:
+            startX = (item.collectionViewWidth / 2)
+        }
+        
         if !isCommonBehaviour {
             startX += separatorWidth
         }
         
         if spaceBefore < (item.collectionViewWidth - cellWidth) / 2 {
+            switch  alignment {
+            case .center:
             startX = isCommonBehaviour
                 ? spaceBefore
                 : item.collectionViewWidth - spaceBefore - cellWidth + separatorWidth
+            case .left:
+                startX = isCommonBehaviour
+                    ? spaceBefore
+                    : item.collectionViewWidth - spaceBefore - cellWidth + separatorWidth
+            default:
+                break
+            }
         }
         if spaceAfter < (item.collectionViewWidth - cellWidth) / 2 {
+            switch  alignment {
+            case .center:
             startX = isCommonBehaviour
                 ? item.collectionViewWidth - spaceAfter - cellWidth
                 : spaceAfter + (item.isLastItem ? 0 : separatorWidth)
+            case .left:
+                startX = isCommonBehaviour
+                    ? item.collectionViewWidth - spaceAfter - cellWidth
+                    : spaceAfter + (item.isLastItem ? 0 : separatorWidth)
+            default:
+                break
+            }
         }
                 
         let additionalOffsetForLastItem: CGFloat = item.isLastItem ? separatorWidth : 0
