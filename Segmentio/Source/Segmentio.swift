@@ -372,12 +372,16 @@ open class Segmentio: UIView {
                 isCommonBehaviour: isCommonBehaviour,
                 alignment: indicatorAlignment
             )
-            let insetX = ((points.endPoint.x - points.startPoint.x) - (item.endX - item.startX)) / 2
+            var insetX = ((points.endPoint.x - points.startPoint.x) - (item.endX - item.startX)) / 2
+            if indicatorAlignment == .left {
+                insetX = 0
+            }
             
             // check rounded property
             let roundedCorners = segmentioOptions.indicatorOptions?.roundedCorners ?? false
             let lineCapSize = roundedCorners ? (segmentioOptions.indicatorOptions?.height ?? 0) / 2 : 0
 
+            print("SEGMENTIO | Moving indicator layer...")
             moveShapeLayer(
                 indicatorLayer,
                 startPoint: CGPoint(x: points.startPoint.x + lineCapSize + insetX, y: points.startPoint.y),
@@ -399,7 +403,7 @@ open class Segmentio: UIView {
                 style: segmentioStyle,
                 insets: superviewInsets,
                 isCommonBehaviour: isCommonBehaviour,
-                alignment: indicatorAlignment
+                alignment: .center
             )
 
             moveShapeLayer(
@@ -747,46 +751,28 @@ extension Segmentio.Points {
         // Cell will try to position itself in the middle, unless it can't because
         // the collection view has reached the beginning or end
         
-        switch  alignment {
-        case .center:
-            startX = (item.collectionViewWidth / 2) - (cellWidth / 2)
-        case .left:
-            startX = (item.collectionViewWidth / 2) - cellWidth
-        case .right:
-            startX = (item.collectionViewWidth / 2)
-        }
+ 
+        startX = (item.collectionViewWidth / 2) - (cellWidth / 2)
+        
         
         if !isCommonBehaviour {
             startX += separatorWidth
         }
         
         if spaceBefore < (item.collectionViewWidth - cellWidth) / 2 {
-            switch  alignment {
-            case .center:
+            print("SEGMENTIO | Space before stuff")
+
             startX = isCommonBehaviour
                 ? spaceBefore
                 : item.collectionViewWidth - spaceBefore - cellWidth + separatorWidth
-            case .left:
-                startX = isCommonBehaviour
-                    ? spaceBefore
-                    : item.collectionViewWidth - spaceBefore - cellWidth + separatorWidth
-            default:
-                break
-            }
+
         }
         if spaceAfter < (item.collectionViewWidth - cellWidth) / 2 {
-            switch  alignment {
-            case .center:
+            print("SEGMENTIO | space after stuff")
+ 
             startX = isCommonBehaviour
                 ? item.collectionViewWidth - spaceAfter - cellWidth
                 : spaceAfter + (item.isLastItem ? 0 : separatorWidth)
-            case .left:
-                startX = isCommonBehaviour
-                    ? item.collectionViewWidth - spaceAfter - cellWidth
-                    : spaceAfter + (item.isLastItem ? 0 : separatorWidth)
-            default:
-                break
-            }
         }
                 
         let additionalOffsetForLastItem: CGFloat = item.isLastItem ? separatorWidth : 0
