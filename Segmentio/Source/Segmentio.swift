@@ -791,9 +791,10 @@ extension Segmentio.Points {
                 
         let additionalOffsetForLastItem: CGFloat = item.isLastItem ? separatorWidth : 0
         endX = startX + cellWidth + additionalOffsetForLastItem
-                        
+                  
         startPoint = CGPoint(x: startX, y: pointY)
         endPoint = CGPoint(x: endX, y: pointY)
+        print("SEGMENTIO | StartPt: \(startPoint) -- EndPt: \(endPoint)")
     }
     
 }
